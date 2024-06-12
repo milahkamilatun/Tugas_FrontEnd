@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Additional Custom Styles */
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60vh;
+            /* Sesuaikan tinggi sesuai kebutuhan */
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto py-8">
+        <div class="w-full bg-white p-6 rounded-lg shadow-md">
+            <input type="text" placeholder="Name of stuff" id="name"
+                class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            <input type="number" id="price" placeholder="Price of stuff"
+                class="w-full mt-4 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            <select id="category"
+                class="w-full mt-4 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                <option value="Furniture">Furniture</option>
+                <option value="Electronik">Electronik</option>
+            </select>
+            <button type="button" id="trigger" onclick="SaveStuff()"
+                class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Save</button>
+        </div>
+        <div class="w-full mt-8 bg-white p-6 rounded-lg shadow-md">
+            <table class="w-full">
+                <thead class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                    <tr>
+                        <th class="border px-4 py-2">#</th>
+                        <th class="border px-4 py-2">Name</th>
+                        <th class="border px-4 py-2">Category</th>
+                        <th class="border px-4 py-2">Price</th>
+                        <th class="border px-4 py-2">Action</th>
+                    </tr </thead>
+                <tbody id="result">
+                    <tr>
+                        <td colspan="5" class="text-center">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+
+        const UpdateStuff = async (id) => {
+            const nameVal = document.getElementById('name').value;
+            const priceVal = document.getElementById('price').value;
+            const categoryVal = document.getElementById('category').value;
+            await axios.patch(`http://localhost:3000/stuff/${id}`, {
+                name: nameVal,
+                price: priceVal,
+                category: categoryVal,
+            })
+                .then((response) => {
+                    console.log(response);
+                    document.getElementById('name').value = '';
+                    document.getElementById('price').value = '';
+                    document.getElementById('category').value = '';
+                    document.getElementById('trigger').innerText = 'Save';
+                    document.getElementById('trigger').setAttribute('onclick', `SaveStuff`)
+                    alert('Data berhasil diupdate');
+                    GetStuff();
+                })
+                .catch((error) => {
+                    alert('Maaf server sedang offline');
+                })
+        }
+
+        const EditStuff = async (id) => {
+            await axios.get(`http://localhost:3000/stuff/${id}`)
+                .then((response) => {
+                    console.log(response.data);
+                    const stuff = response.data;
+                    document.getElementById('name').value = stuff.name;
+                    document.getElementById('price').value = stuff.price;
+                    document.getElementById('category').value = stuff.category;
+                    document.getElementById('trigger').innerText = 'Update';
+                    document.getElementById('trigger').setAttribute('onclick', `UpdateStuff('${id}')`)
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        }
+
+        const GetStuff = async () => {
+            await axios.get('http://localhost:3000/stuff')
+                .then((response) => {
+                    console.log(response);
+                    const stuffs = response.data;
+                    let bucket = "";
+                    stuffs.forEach((stuff, index) => {
+                        bucket += `
+                <tr>
+                    <td class="text-center">${index + 1}</td>
+                    <td class="text-center">${stuff.name}</td>
+                    <td class="text-center">${stuff.category}</td>
+                    <td class="text-center">$${stuff.price}</td>
+                    <td class="text-center">
+                        <button onclick="EditStuff('${stuff.id}')" type="button" class="bg-green-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                            Edit
+                        </button>
+                        <button onclick="DeleteStuff('${stuff.id}')" type="button" class="bg-blue-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                `
+                    });
+                    document.getElementById('result').innerHTML = bucket;
+                })
+                .catch((Error) => {
+                    alert('Maaf server sedang offline');
+                })
+        }
+        GetStuff();
+
+        const DeleteStuff = async (id) => {
+        const confirmed = confirm('Apakah ini akan dihapus?');
+        if (confirmed) {
+            try {
+                await axios.delete(`http://localhost:3000/stuff/${id}`);
+                GetStuff();
+                showAlert('Data berhasil dihapus', 'success');
+            } catch (error) {
+                showAlert('Gagal menghapus data', 'danger');
+            }
+        }
+    };
+
+        const SaveStuff = async () => {
+            const nameVal = document.getElementById('name').value;
+            const priceVal = document.getElementById('price').value;
+            const categoryVal = document.getElementById('category').value;
+
+            await axios.post('http://localhost:3000/stuff', {
+                name: nameVal,
+                price: priceVal,
+                category: categoryVal,
+            })
+                .then((response) => {
+                    console.log(response);
+                    alert('Data berhasil di simpan');
+                    GetStuff();
+                })
+                .catch((error) => {
+                    alert('Maaf server sedang offline');
+                })
+        }
+
+        const GetCategory = async () => {
+            await axios.get('http://localhost:3000/category')
+                .then((response) => {
+                    console.log(response);
+                    const categories = response.data;
+                    let bucket = "";
+                    categories.forEach((category, index) => {
+                        bucket += `<option value="${category.name}">${category.name}</option>`;
+                    });
+                    document.getElementById('category').innerHTML = bucket;
+                })
+                .catch((Error) => {
+                    alert('Maaf server sedang offline');
+                })
+        }
+        GetCategory();
+
+    </script>
+</body>
+
+</html>

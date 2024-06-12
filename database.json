@@ -1,0 +1,72 @@
+{
+  "stuff": [
+    {
+      "id": "a734",
+      "name": "mouse",
+      "price": "300",
+      "category": "mouse"
+    },
+    {
+      "id": "7e60",
+      "name": "chair",
+      "price": "500",
+      "category": "Furniture"
+    },
+    {
+      "id": "e810",
+      "name": "chair",
+      "price": "300",
+      "category": "Furniture"
+    },
+    {
+      "id": "e666",
+      "name": "computer",
+      "price": "900",
+      "category": "Electronik"
+    },
+    {
+      "id": "55dd",
+      "name": "keyboard",
+      "price": "900",
+      "category": "Electronik"
+    },
+    {
+      "id": "e7c6",
+      "name": "Bed",
+      "price": "1500",
+      "category": "Furniture"
+    },
+    {
+      "id": "a247",
+      "name": "pc",
+      "price": "1100",
+      "category": "Electronik"
+    },
+    {
+      "id": "683f",
+      "name": "vga",
+      "price": "100",
+      "category": "Electronik"
+    },
+    {
+      "id": "ba53",
+      "name": "tv",
+      "price": "400",
+      "category": "Electronik"
+    }
+  ],
+  "category": [
+    {
+      "id": "ba53",
+      "name": "Food"
+    },
+    {
+      "id": "1963",
+      "name": "Food"
+    },
+    {
+      "id": "d185",
+      "name": "mouse"
+    }
+  ]
+}
